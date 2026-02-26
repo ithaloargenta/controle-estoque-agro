@@ -1,0 +1,38 @@
+[project]
+name = "estoque"
+version = "0.1.0"
+description = "Sistema de controle de estoque agropecuário"
+authors = [
+    {name = "Ithalo"}
+]
+requires-python = "^3.13"
+dependencies = [
+    "fastapi (>=0.133.0,<0.134.0)",
+    "uvicorn[standard] (>=0.41.0,<0.42.0)",
+    "sqlalchemy (>=2.0.47,<3.0.0)",
+    "alembic (>=1.18.4,<2.0.0)",
+    "psycopg2-binary (>=2.9.11,<3.0.0)",
+    "pydantic-settings (>=2.13.1,<3.0.0)",
+    "python-jose (>=3.5.0,<4.0.0)",
+    "passlib (>=1.7.4,<2.0.0)",
+    "python-multipart (>=0.0.22,<0.0.23)",
+    "pydantic[email] (>=2.12.5,<3.0.0)",
+    "bcrypt (>=5.0.0,<6.0.0)"
+]
+
+[tool.poetry]
+package-mode = false
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=9.0.2,<10.0.0)",
+    "httpx (>=0.28.1,<0.29.0)"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

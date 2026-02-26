@@ -1,0 +1,16 @@
+# Ambiente virtual
+.venv/
+
+# Variáveis de ambiente — NUNCA versionar o .env real
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Testes
+.pytest_cache/
+
+# VSCode
+.vscode/
