@@ -11,6 +11,7 @@ class CadastrarProdutoInput:
     unidade_comercial: str
     ncm: str | None = None
     requer_validade: bool = False
+    estoque_minimo: int = 2
 
 
 @dataclass
@@ -21,6 +22,7 @@ class CadastrarProdutoOutput:
     ncm: str | None
     requer_validade: bool
     ativo: bool
+    estoque_minimo: int
 
 
 class CadastrarProduto:
@@ -33,6 +35,7 @@ class CadastrarProduto:
             unidade_comercial=input.unidade_comercial,
             ncm=input.ncm,
             requer_validade=input.requer_validade,
+            estoque_minimo=input.estoque_minimo,
         )
 
         produto_salvo = self.produto_repository.salvar(produto)
@@ -44,4 +47,5 @@ class CadastrarProduto:
             ncm=produto_salvo.ncm,
             requer_validade=produto_salvo.requer_validade,
             ativo=produto_salvo.ativo,
+            estoque_minimo=produto_salvo.estoque_minimo,
         )

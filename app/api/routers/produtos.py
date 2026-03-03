@@ -21,6 +21,7 @@ def cadastrar_produto(
                 unidade_comercial=body.unidade_comercial,
                 ncm=body.ncm,
                 requer_validade=body.requer_validade,
+                estoque_minimo=body.estoque_minimo,
             )
         )
         return resultado

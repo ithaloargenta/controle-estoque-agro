@@ -74,3 +74,67 @@ def get_importar_xml_nfe(db: Session = Depends(get_db)) -> ImportarXmlNFe:
         ProdutoRepositoryImpl(db),
         MovimentacaoRepositoryImpl(db),
     )
+
+from app.application.use_cases.consultar_estoque_enriquecido import ConsultarEstoqueEnriquecido
+
+def get_consultar_estoque_enriquecido(db: Session = Depends(get_db)) -> ConsultarEstoqueEnriquecido:
+    return ConsultarEstoqueEnriquecido(db)
+
+from app.application.use_cases.relatorio_reposicao import RelatorioReposicao
+
+def get_relatorio_reposicao(db: Session = Depends(get_db)) -> RelatorioReposicao:
+    return RelatorioReposicao(db)
+
+from app.application.use_cases.relatorio_vencimento import RelatorioVencimento
+
+def get_relatorio_vencimento(db: Session = Depends(get_db)) -> RelatorioVencimento:
+    return RelatorioVencimento(db)
+
+from app.application.use_cases.relatorio_vencidos import RelatorioVencidos
+
+def get_relatorio_vencidos(db: Session = Depends(get_db)) -> RelatorioVencidos:
+    return RelatorioVencidos(db)
+
+from app.application.use_cases.relatorio_giro import RelatorioGiro
+
+def get_relatorio_giro(db: Session = Depends(get_db)) -> RelatorioGiro:
+    return RelatorioGiro(db)
+
+from app.application.use_cases.relatorio_gasto_fornecedor import RelatorioGastoFornecedor
+
+def get_relatorio_gasto_fornecedor(db: Session = Depends(get_db)) -> RelatorioGastoFornecedor:
+    return RelatorioGastoFornecedor(db)
+
+from app.application.use_cases.relatorio_historico import RelatorioHistorico
+
+def get_relatorio_historico(db: Session = Depends(get_db)) -> RelatorioHistorico:
+    return RelatorioHistorico(db)
+
+from app.application.use_cases.relatorio_sem_movimentacao import RelatorioSemMovimentacao
+
+def get_relatorio_sem_movimentacao(db: Session = Depends(get_db)) -> RelatorioSemMovimentacao:
+    return RelatorioSemMovimentacao(db)
+
+from app.application.use_cases.relatorio_valor_estoque import RelatorioValorEstoque
+
+def get_relatorio_valor_estoque(db: Session = Depends(get_db)) -> RelatorioValorEstoque:
+    return RelatorioValorEstoque(db)
+
+from app.application.use_cases.relatorio_curva_abc import RelatorioCurvaABC
+
+def get_relatorio_curva_abc(db: Session = Depends(get_db)) -> RelatorioCurvaABC:
+    return RelatorioCurvaABC(db)
+
+from app.application.use_cases.relatorio_preco_custo import RelatorioPrecoCusto
+
+def get_relatorio_preco_custo(db: Session = Depends(get_db)) -> RelatorioPrecoCusto:
+    return RelatorioPrecoCusto(db)
+
+from app.application.use_cases.relatorio_sazonalidade import RelatorioSazonalidade
+
+def get_relatorio_sazonalidade(db: Session = Depends(get_db)) -> RelatorioSazonalidade:
+    return RelatorioSazonalidade(db)
+from app.application.use_cases.relatorio_comparativo_mensal import RelatorioComparativoMensal
+
+def get_relatorio_comparativo_mensal(db: Session = Depends(get_db)) -> RelatorioComparativoMensal:
+    return RelatorioComparativoMensal(db)

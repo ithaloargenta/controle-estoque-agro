@@ -13,3 +13,15 @@ class EstoqueResponse(BaseModel):
     validade: date | None
 
     model_config = {"from_attributes": True}
+
+
+class EstoqueEnriquecidoResponse(BaseModel):
+    produto_id: UUID
+    descricao: str
+    ncm: str | None
+    unidade_comercial: str
+    localizacao: str
+    quantidade: Decimal
+    estoque_minimo: int
+    abaixo_do_minimo: bool
+    validade: date | None

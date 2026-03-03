@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, String, func
+from sqlalchemy import Boolean, DateTime, Integer, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.infrastructure.database.connection import Base
@@ -20,6 +20,9 @@ class ProdutoModel(Base):
         Boolean, nullable=False, default=False
     )
     ativo: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    estoque_minimo: Mapped[int] = mapped_column(
+        Integer, nullable=False, default=2
+    )
     criado_em: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False, server_default=func.now()
     )

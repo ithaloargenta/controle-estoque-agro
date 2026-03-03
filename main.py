@@ -8,6 +8,7 @@ from app.api.routers.movimentacoes import router as movimentacoes_router
 from app.api.routers.estoque import router as estoque_router
 from app.api.routers.usuarios import router as usuarios_router
 from app.api.routers.importacao import router as importacao_router
+from app.api.routers.relatorios import router as relatorios_router
 
 app = FastAPI(
     title="Sistema de Controle de Estoque",
@@ -22,6 +23,7 @@ app.include_router(movimentacoes_router)
 app.include_router(estoque_router)
 app.include_router(usuarios_router)
 app.include_router(importacao_router)
+app.include_router(relatorios_router)
 
 
 @app.get("/health")

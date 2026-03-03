@@ -7,6 +7,7 @@ class ProdutoCreate(BaseModel):
     unidade_comercial: str = Field(min_length=1, max_length=10)
     ncm: str | None = Field(default=None, min_length=8, max_length=8)
     requer_validade: bool = False
+    estoque_minimo: int = Field(default=2, ge=0)
 
 
 class ProdutoResponse(BaseModel):
@@ -16,5 +17,6 @@ class ProdutoResponse(BaseModel):
     ncm: str | None
     requer_validade: bool
     ativo: bool
+    estoque_minimo: int
 
     model_config = {"from_attributes": True}

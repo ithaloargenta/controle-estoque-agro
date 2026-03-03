@@ -11,6 +11,7 @@ class Produto:
     ncm: str | None = None
     requer_validade: bool = False
     ativo: bool = True
+    estoque_minimo: int = 2
     criado_em: datetime = field(default_factory=datetime.now)
 
     def validar_validade_para_movimentacao(self, validade: date | None) -> None:
