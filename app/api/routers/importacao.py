@@ -12,6 +12,8 @@ class ImportacaoResponse(BaseModel):
     produtos_criados: int
     produtos_existentes: int
     movimentacoes_geradas: int
+    fornecedor_criado: bool
+    fornecedor_nome: str | None
     detalhes: list[str]
 
 
@@ -34,14 +36,14 @@ async def importar_nfe(
     conteudo = await arquivo.read()
 
     try:
-        itens = parsear_xml_nfe(conteudo)
+        resultado_parser = parsear_xml_nfe(conteudo)
     except Exception:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Erro ao processar o XML. Verifique se é um XML de NF-e válido.",
         )
 
-    if not itens:
+    if not resultado_parser.itens:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Nenhum item encontrado no XML.",
@@ -49,9 +51,10 @@ async def importar_nfe(
 
     resultado = use_case.executar(
         ImportarXmlNFeInput(
-            itens=itens,
+            itens=resultado_parser.itens,
             usuario_id=usuario_atual.id,
             localizacao=localizacao,
+            emitente=resultado_parser.emitente,
         )
     )
 

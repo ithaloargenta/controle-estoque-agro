@@ -16,14 +16,35 @@ class ItemNFe:
     codigo_fornecedor: str | None
 
 
-def parsear_xml_nfe(conteudo_xml: bytes) -> list[ItemNFe]:
-    """
-    Recebe o conteúdo binário de um XML de NF-e e retorna
-    a lista de itens extraídos.
-    """
-    root = ET.fromstring(conteudo_xml)
-    itens = []
+@dataclass
+class Emitente:
+    cnpj: str
+    razao_social: str
 
+
+@dataclass
+class ResultadoParserNFe:
+    emitente: Emitente | None
+    itens: list[ItemNFe]
+
+
+def parsear_xml_nfe(conteudo_xml: bytes) -> ResultadoParserNFe:
+    root = ET.fromstring(conteudo_xml)
+
+    # Extrai dados do emitente
+    emit = root.find(".//nfe:emit", NS)
+    emitente = None
+    if emit is not None:
+        cnpj = _texto(emit, "nfe:CNPJ")
+        razao_social = _texto(emit, "nfe:xNome")
+        if cnpj and razao_social:
+            emitente = Emitente(
+                cnpj=cnpj,
+                razao_social=razao_social,
+            )
+
+    # Extrai itens da nota
+    itens = []
     for det in root.findall(".//nfe:det", NS):
         prod = det.find("nfe:prod", NS)
         if prod is None:
@@ -50,10 +71,9 @@ def parsear_xml_nfe(conteudo_xml: bytes) -> list[ItemNFe]:
             )
         )
 
-    return itens
+    return ResultadoParserNFe(emitente=emitente, itens=itens)
 
 
 def _texto(elemento: ET.Element, tag: str) -> str | None:
-    """Extrai o texto de uma tag filha ou retorna None se não existir."""
     filho = elemento.find(tag, NS)
     return filho.text if filho is not None else None
