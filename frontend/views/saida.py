@@ -5,33 +5,52 @@ from services.api import get, post
 def render():
     st.title("🔻 Saída")
 
-    # Busca estoque
     estoque = get("/estoque/enriquecido") or []
     itens_com_estoque = [item for item in estoque if float(item["quantidade"]) > 0]
-    produtos = {item["descricao"]: item for item in itens_com_estoque}
 
-    if not produtos:
+    if not itens_com_estoque:
         st.info("Nenhum produto com estoque disponível.")
         return
+
+    # Agrupa por produto — pode ter múltiplos lotes
+    produtos_nomes = sorted(set(item["descricao"] for item in itens_com_estoque))
 
     col1, col2 = st.columns(2)
 
     with col1:
-        produto_nome = st.selectbox("Produto", options=list(produtos.keys()))
+        produto_nome = st.selectbox("Produto", options=produtos_nomes)
 
-    produto = produtos.get(produto_nome)
-    estoque_atual = float(produto["quantidade"]) if produto else 0
+    # Lotes do produto selecionado
+    lotes = [item for item in itens_com_estoque if item["descricao"] == produto_nome]
 
     with col2:
-        st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown(f"**Estoque atual:** {estoque_atual:.3f} {produto['unidade_comercial']}")
+        if len(lotes) > 1:
+            lote_opcoes = {
+                f"Validade: {l['validade']} — Estoque: {float(l['quantidade']):.3f}": l
+                for l in lotes if l.get("validade")
+            }
+            # Adiciona lotes sem validade
+            sem_validade = [l for l in lotes if not l.get("validade")]
+            for l in sem_validade:
+                lote_opcoes[f"Sem validade — Estoque: {float(l['quantidade']):.3f}"] = l
+
+            lote_label = st.selectbox("Lote", options=list(lote_opcoes.keys()))
+            produto = lote_opcoes[lote_label]
+        else:
+            produto = lotes[0]
+            validade_label = f"Validade: {produto['validade']}" if produto.get("validade") else "Sem validade"
+            st.markdown("<br>", unsafe_allow_html=True)
+            st.markdown(f"**{validade_label}**")
+
+    estoque_atual = float(produto["quantidade"])
+    st.markdown(f"**Estoque disponível:** {estoque_atual:.3f} {produto['unidade_comercial']}")
 
     quantidade = st.number_input(
         "Quantidade",
         min_value=0.001,
         max_value=estoque_atual,
         step=0.001,
-        format="%.3f"
+        format="%.3f",
     )
 
     estoque_apos = estoque_atual - quantidade
@@ -41,6 +60,7 @@ def render():
             "produto_id": produto["produto_id"],
             "produto_nome": produto_nome,
             "localizacao": produto["localizacao"],
+            "validade": produto.get("validade"),
             "quantidade": quantidade,
             "estoque_atual": estoque_atual,
             "estoque_apos": estoque_apos,
@@ -53,6 +73,8 @@ def render():
         st.markdown("### Confirmar saída")
         st.markdown(f"**Produto:** {r['produto_nome']}")
         st.markdown(f"**Localização:** {r['localizacao']}")
+        if r["validade"]:
+            st.markdown(f"**Validade do lote:** {r['validade']}")
         st.markdown(f"**Quantidade a baixar:** {r['quantidade']:.3f} {r['unidade']}")
 
         col1, col2 = st.columns(2)
@@ -70,6 +92,7 @@ def render():
                     "localizacao": r["localizacao"],
                     "tipo": "SAIDA",
                     "quantidade": r["quantidade"],
+                    "validade": r["validade"],
                 })
                 if resultado:
                     st.success("Saída registrada com sucesso!")

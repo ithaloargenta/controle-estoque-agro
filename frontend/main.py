@@ -187,11 +187,12 @@ def menu_lateral():
             options=[
                 "🏠  Início",
                 "📦  Estoque",
+                "📋  Histórico",
                 "📥  Importar NF-e",
                 "➕  Entrada manual",
                 "🔻  Saída",
                 "🔧  Ajuste",
-                "🛒  Cadastrar produto",
+                "🛒  Produtos",
                 "🏭  Fornecedores",
                 "📊  Relatórios",
                 "⚙️  Configurações",
@@ -219,6 +220,9 @@ if pagina == "🏠  Início":
 elif pagina == "📦  Estoque":
     from views.estoque import render
     render()
+elif pagina == "📋  Histórico":
+    from views.historico import render
+    render()
 elif pagina == "📥  Importar NF-e":
     from views.importar_nfe import render
     render()
@@ -231,8 +235,8 @@ elif pagina == "🔻  Saída":
 elif pagina == "🔧  Ajuste":
     from views.ajuste import render
     render()
-elif pagina == "🛒  Cadastrar produto":
-    from views.cadastrar_produto import render
+elif pagina == "🛒  Produtos":
+    from views.produtos import render
     render()
 elif pagina == "🏭  Fornecedores":
     from views.fornecedores import render

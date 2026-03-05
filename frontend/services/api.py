@@ -12,16 +12,34 @@ def get_headers() -> dict:
     return {"Authorization": f"Bearer {token}"}
 
 
+def _tratar_erro(response: requests.Response) -> str:
+    try:
+        detalhe = response.json().get("detail", "Erro desconhecido")
+        if isinstance(detalhe, list):
+            return detalhe[0].get("msg", "Erro de validação")
+        return str(detalhe)
+    except Exception:
+        return f"Erro {response.status_code}"
+
+
 def login(email: str, senha: str) -> dict | None:
     try:
         response = requests.post(
             f"{API_URL}/auth/login",
             data={"username": email, "password": senha},
+            timeout=10,
         )
         if response.status_code == 200:
             return response.json()
         return None
-    except Exception:
+    except requests.exceptions.ConnectionError:
+        st.error("Não foi possível conectar ao servidor. Verifique se o sistema está rodando.")
+        return None
+    except requests.exceptions.Timeout:
+        st.error("O servidor demorou para responder. Tente novamente.")
+        return None
+    except Exception as e:
+        st.error(f"Erro inesperado: {e}")
         return None
 
 
@@ -31,11 +49,26 @@ def get(endpoint: str, params: dict = None) -> dict | list | None:
             f"{API_URL}{endpoint}",
             headers=get_headers(),
             params=params,
+            timeout=10,
         )
         if response.status_code == 200:
             return response.json()
+        if response.status_code == 401:
+            st.error("Sessão expirada. Faça login novamente.")
+            st.session_state.clear()
+            st.rerun()
+        if response.status_code == 404:
+            return None
+        st.error(f"Erro ao buscar dados: {_tratar_erro(response)}")
         return None
-    except Exception:
+    except requests.exceptions.ConnectionError:
+        st.error("Não foi possível conectar ao servidor.")
+        return None
+    except requests.exceptions.Timeout:
+        st.error("O servidor demorou para responder. Tente novamente.")
+        return None
+    except Exception as e:
+        st.error(f"Erro inesperado: {e}")
         return None
 
 
@@ -47,6 +80,7 @@ def post(endpoint: str, data: dict = None, files: dict = None, params: dict = No
                 headers=get_headers(),
                 files=files,
                 params=params,
+                timeout=30,
             )
         else:
             response = requests.post(
@@ -54,13 +88,24 @@ def post(endpoint: str, data: dict = None, files: dict = None, params: dict = No
                 headers=get_headers(),
                 json=data,
                 params=params,
+                timeout=10,
             )
         if response.status_code in (200, 201):
             return response.json()
-        st.error(f"Erro: {response.json().get('detail', 'Erro desconhecido')}")
+        if response.status_code == 401:
+            st.error("Sessão expirada. Faça login novamente.")
+            st.session_state.clear()
+            st.rerun()
+        st.error(f"Erro: {_tratar_erro(response)}")
+        return None
+    except requests.exceptions.ConnectionError:
+        st.error("Não foi possível conectar ao servidor.")
+        return None
+    except requests.exceptions.Timeout:
+        st.error("O servidor demorou para responder. Tente novamente.")
         return None
     except Exception as e:
-        st.error(f"Erro de conexão: {e}")
+        st.error(f"Erro inesperado: {e}")
         return None
 
 
@@ -70,11 +115,22 @@ def put(endpoint: str, data: dict = None) -> dict | None:
             f"{API_URL}{endpoint}",
             headers=get_headers(),
             json=data,
+            timeout=10,
         )
         if response.status_code == 200:
             return response.json()
-        st.error(f"Erro: {response.json().get('detail', 'Erro desconhecido')}")
+        if response.status_code == 401:
+            st.error("Sessão expirada. Faça login novamente.")
+            st.session_state.clear()
+            st.rerun()
+        st.error(f"Erro: {_tratar_erro(response)}")
+        return None
+    except requests.exceptions.ConnectionError:
+        st.error("Não foi possível conectar ao servidor.")
+        return None
+    except requests.exceptions.Timeout:
+        st.error("O servidor demorou para responder. Tente novamente.")
         return None
     except Exception as e:
-        st.error(f"Erro de conexão: {e}")
+        st.error(f"Erro inesperado: {e}")
         return None
