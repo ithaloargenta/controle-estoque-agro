@@ -118,7 +118,6 @@ def test_ajuste_saida_sem_motivo():
     produto, produto_repo = make_produto()
     estoque_repo = EstoqueRepositoryFake()
 
-    # Adiciona saldo para que a validação chegue até o motivo
     estoque = Estoque(
         produto_id=produto.id,
         localizacao=Localizacao.LOJA,
