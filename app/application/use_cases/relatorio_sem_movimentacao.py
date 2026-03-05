@@ -12,7 +12,7 @@ class ItemSemMovimentacao:
     unidade_comercial: str
     quantidade_atual: Decimal
     ultima_movimentacao: datetime | None
-    dias_parado: int
+    dias_parado: int | None
 
 
 @dataclass
@@ -32,7 +32,6 @@ class RelatorioSemMovimentacao:
 
         limite = datetime.now() - timedelta(days=input.dias)
 
-        # Busca última movimentação por produto
         ultima_mov = (
             self.db.query(
                 MovimentacaoModel.produto_id,
@@ -42,7 +41,6 @@ class RelatorioSemMovimentacao:
             .subquery()
         )
 
-        # Busca produtos ativos sem movimentação no período
         query = (
             self.db.query(ProdutoModel, ultima_mov.c.ultima)
             .outerjoin(ultima_mov, ProdutoModel.id == ultima_mov.c.produto_id)
@@ -53,21 +51,15 @@ class RelatorioSemMovimentacao:
             )
         )
 
-        resultados = query.all()
-
         itens = []
-        for produto, ultima in resultados:
-            # Busca quantidade atual em estoque
+        for produto, ultima in query.all():
             estoque = (
                 self.db.query(func.sum(EstoqueModel.quantidade))
                 .filter(EstoqueModel.produto_id == produto.id)
                 .scalar() or Decimal("0")
             )
 
-            if ultima:
-                dias_parado = (datetime.now() - ultima).days
-            else:
-                dias_parado = input.dias
+            dias_parado = (datetime.now() - ultima).days if ultima else None
 
             itens.append(ItemSemMovimentacao(
                 produto_id=produto.id,
@@ -79,4 +71,4 @@ class RelatorioSemMovimentacao:
                 dias_parado=dias_parado,
             ))
 
-        return sorted(itens, key=lambda x: x.dias_parado, reverse=True)
+        return sorted(itens, key=lambda x: x.dias_parado or 99999, reverse=True)

@@ -48,6 +48,14 @@ def vincular_produto(
     from app.infrastructure.models.produto_fornecedor import ProdutoFornecedorModel
     from uuid import UUID
 
+    existente = db.query(ProdutoFornecedorModel).filter(
+        ProdutoFornecedorModel.produto_id == UUID(body["produto_id"]),
+        ProdutoFornecedorModel.fornecedor_id == UUID(fornecedor_id),
+    ).first()
+
+    if existente:
+        return {"ok": True, "mensagem": "Vínculo já existe."}
+
     vinculo = ProdutoFornecedorModel(
         produto_id=UUID(body["produto_id"]),
         fornecedor_id=UUID(fornecedor_id),
@@ -55,4 +63,4 @@ def vincular_produto(
     )
     db.add(vinculo)
     db.commit()
-    return {"ok": True}
+    return {"ok": True, "mensagem": "Produto vinculado com sucesso."}

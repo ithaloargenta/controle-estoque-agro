@@ -5,19 +5,20 @@ from services.api import get, post
 def render():
     st.title("➕ Entrada manual")
 
-    # Busca produtos
-    estoque = get("/estoque/enriquecido") or []
-    produtos = {item["descricao"]: item for item in estoque}
+    # Busca todos os produtos cadastrados, não só os que têm estoque
+    produtos_lista = get("/produtos/") or []
 
-    if not produtos:
+    if not produtos_lista:
         st.info("Nenhum produto cadastrado.")
         return
+
+    produtos = {p["descricao"]: p for p in produtos_lista}
 
     col1, col2 = st.columns(2)
 
     with col1:
-        produto_nome = st.selectbox("Produto", options=list(produtos.keys()))
-    
+        produto_nome = st.selectbox("Produto", options=sorted(produtos.keys()))
+
     produto = produtos.get(produto_nome)
 
     with col2:
@@ -31,20 +32,26 @@ def render():
     with col4:
         valor_unitario = st.number_input("Valor unitário (R$)", min_value=0.0, step=0.01, format="%.2f")
 
-    requer_validade = produto.get("validade") is not None if produto else False
     validade = None
-    if requer_validade or st.checkbox("Informar validade"):
+    requer_validade = produto.get("requer_validade", False) if produto else False
+    if requer_validade:
+        st.warning("Este produto requer data de validade.")
+        validade = st.date_input("Validade")
+    elif st.checkbox("Informar validade"):
         validade = st.date_input("Validade")
 
     if st.button("Revisar entrada", type="primary", use_container_width=True):
-        st.session_state["entrada_revisao"] = {
-            "produto_id": produto["produto_id"],
-            "produto_nome": produto_nome,
-            "localizacao": localizacao,
-            "quantidade": quantidade,
-            "valor_unitario": valor_unitario if valor_unitario > 0 else None,
-            "validade": validade.isoformat() if validade else None,
-        }
+        if requer_validade and not validade:
+            st.error("Este produto requer data de validade.")
+        else:
+            st.session_state["entrada_revisao"] = {
+                "produto_id": str(produto["id"]),
+                "produto_nome": produto_nome,
+                "localizacao": localizacao,
+                "quantidade": quantidade,
+                "valor_unitario": valor_unitario if valor_unitario > 0 else None,
+                "validade": validade.isoformat() if validade else None,
+            }
 
     if "entrada_revisao" in st.session_state:
         r = st.session_state["entrada_revisao"]

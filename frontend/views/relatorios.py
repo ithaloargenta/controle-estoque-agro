@@ -176,7 +176,7 @@ def render():
     # --- R07 Sem movimentação ---
     with aba[6]:
         st.markdown("### Produtos sem movimentação")
-        dias = st.slider("Produtos parados há mais de X dias", 30, 365, 90)
+        dias = st.number_input("Produtos parados há mais de X dias", min_value=1, value=90, step=1)
         dados = get("/relatorios/sem-movimentacao", params={"dias": dias}) or []
         if not dados:
             st.success(f"Todos os produtos tiveram movimentação nos últimos {dias} dias.")
@@ -184,6 +184,8 @@ def render():
             df = pd.DataFrame(dados)
             df_exibir = df[["descricao", "unidade_comercial", "quantidade_atual", "ultima_movimentacao", "dias_parado"]].copy()
             df_exibir.columns = ["Produto", "Unidade", "Quantidade", "Última movimentação", "Dias parado"]
+            df_exibir["Dias parado"] = df_exibir["Dias parado"].apply(lambda x: "Nunca movimentado" if x is None else str(x))
+            df_exibir["Última movimentação"] = df_exibir["Última movimentação"].apply(lambda x: "—" if x is None else str(x)[:16].replace("T", " "))
             st.dataframe(df_exibir, use_container_width=True, hide_index=True)
             exportar_excel(df_exibir, "sem_movimentacao")
 

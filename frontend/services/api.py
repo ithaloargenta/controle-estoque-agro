@@ -33,7 +33,7 @@ def login(email: str, senha: str) -> dict | None:
             return response.json()
         return None
     except requests.exceptions.ConnectionError:
-        st.error("Não foi possível conectar ao servidor. Verifique se o sistema está rodando.")
+        st.error("Não foi possível conectar ao servidor.")
         return None
     except requests.exceptions.Timeout:
         st.error("O servidor demorou para responder. Tente novamente.")
@@ -112,6 +112,33 @@ def post(endpoint: str, data: dict = None, files: dict = None, params: dict = No
 def put(endpoint: str, data: dict = None) -> dict | None:
     try:
         response = requests.put(
+            f"{API_URL}{endpoint}",
+            headers=get_headers(),
+            json=data,
+            timeout=10,
+        )
+        if response.status_code == 200:
+            return response.json()
+        if response.status_code == 401:
+            st.error("Sessão expirada. Faça login novamente.")
+            st.session_state.clear()
+            st.rerun()
+        st.error(f"Erro: {_tratar_erro(response)}")
+        return None
+    except requests.exceptions.ConnectionError:
+        st.error("Não foi possível conectar ao servidor.")
+        return None
+    except requests.exceptions.Timeout:
+        st.error("O servidor demorou para responder. Tente novamente.")
+        return None
+    except Exception as e:
+        st.error(f"Erro inesperado: {e}")
+        return None
+
+
+def patch(endpoint: str, data: dict = None) -> dict | None:
+    try:
+        response = requests.patch(
             f"{API_URL}{endpoint}",
             headers=get_headers(),
             json=data,

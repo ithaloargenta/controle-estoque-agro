@@ -86,6 +86,10 @@ class ImportarXmlNFe:
                 produtos_existentes += 1
                 detalhes.append(f"Produto já existente: '{item.descricao}'")
 
+            # Vincula produto ao fornecedor se ainda não estiver vinculado
+            if fornecedor and self.db:
+                self._vincular_produto_fornecedor(produto.id, fornecedor.id, item.codigo_fornecedor)
+
             movimentacao = Movimentacao(
                 produto_id=produto.id,
                 localizacao=input.localizacao,
@@ -134,3 +138,20 @@ class ImportarXmlNFe:
             requer_validade=False,
         )
         return self.produto_repository.salvar(produto), True
+
+    def _vincular_produto_fornecedor(self, produto_id: UUID, fornecedor_id: UUID, codigo_fornecedor: str | None):
+        from app.infrastructure.models.produto_fornecedor import ProdutoFornecedorModel
+
+        existente = self.db.query(ProdutoFornecedorModel).filter(
+            ProdutoFornecedorModel.produto_id == produto_id,
+            ProdutoFornecedorModel.fornecedor_id == fornecedor_id,
+        ).first()
+
+        if not existente:
+            vinculo = ProdutoFornecedorModel(
+                produto_id=produto_id,
+                fornecedor_id=fornecedor_id,
+                codigo_fornecedor=codigo_fornecedor,
+            )
+            self.db.add(vinculo)
+            self.db.commit()

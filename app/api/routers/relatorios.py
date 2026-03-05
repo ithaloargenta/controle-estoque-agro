@@ -109,8 +109,7 @@ class ItemSemMovimentacaoResponse(BaseModel):
     unidade_comercial: str
     quantidade_atual: Decimal
     ultima_movimentacao: datetime | None
-    dias_parado: int
-
+    dias_parado: int | None
 
 class ItemValorEstoqueResponse(BaseModel):
     produto_id: UUID

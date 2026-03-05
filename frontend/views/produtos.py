@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from services.api import get, post
+from services.api import patch
 
 
 def render():
@@ -56,7 +57,7 @@ def render():
                         col_sim, col_nao = st.columns(2)
                         with col_sim:
                             if st.button("✅ Confirmar", key=f"conf_{produto['id']}", type="primary"):
-                                resultado = post(f"/produtos/{produto['id']}/desativar")
+                                resultado = patch(f"/produtos/{produto['id']}/desativar")
                                 if resultado:
                                     st.success(resultado.get("mensagem", "Produto desativado."))
                                     del st.session_state[f"confirmar_desativar_{produto['id']}"]
