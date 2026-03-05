@@ -7,3 +7,4 @@ from app.infrastructure.models.produto_fornecedor import ProdutoFornecedorModel 
 from app.infrastructure.models.estoque import EstoqueModel  # noqa: F401
 from app.infrastructure.models.movimentacao import MovimentacaoModel  # noqa: F401
 from app.infrastructure.models.ncm_regra import NcmRegraModel  # noqa: F401
+from app.infrastructure.models.nfe_importada import NfeImportadaModel  # noqa: F401

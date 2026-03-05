@@ -49,13 +49,20 @@ async def importar_nfe(
             detail="Nenhum item encontrado no XML.",
         )
 
-    resultado = use_case.executar(
-        ImportarXmlNFeInput(
-            itens=resultado_parser.itens,
-            usuario_id=usuario_atual.id,
-            localizacao=localizacao,
-            emitente=resultado_parser.emitente,
+    try:
+        resultado = use_case.executar(
+            ImportarXmlNFeInput(
+                itens=resultado_parser.itens,
+                usuario_id=usuario_atual.id,
+                localizacao=localizacao,
+                emitente=resultado_parser.emitente,
+                chave_acesso=resultado_parser.chave_acesso,
+            )
         )
-    )
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e),
+        )
 
     return resultado

@@ -26,10 +26,17 @@ class Emitente:
 class ResultadoParserNFe:
     emitente: Emitente | None
     itens: list[ItemNFe]
+    chave_acesso: str | None
 
 
 def parsear_xml_nfe(conteudo_xml: bytes) -> ResultadoParserNFe:
     root = ET.fromstring(conteudo_xml)
+
+    # Extrai chave de acesso
+    chave_acesso = None
+    inf_nfe = root.find(".//nfe:infNFe", NS)
+    if inf_nfe is not None:
+        chave_acesso = inf_nfe.get("Id", "").replace("NFe", "") or None
 
     # Extrai dados do emitente
     emit = root.find(".//nfe:emit", NS)
@@ -38,10 +45,7 @@ def parsear_xml_nfe(conteudo_xml: bytes) -> ResultadoParserNFe:
         cnpj = _texto(emit, "nfe:CNPJ")
         razao_social = _texto(emit, "nfe:xNome")
         if cnpj and razao_social:
-            emitente = Emitente(
-                cnpj=cnpj,
-                razao_social=razao_social,
-            )
+            emitente = Emitente(cnpj=cnpj, razao_social=razao_social)
 
     # Extrai itens da nota
     itens = []
@@ -71,7 +75,7 @@ def parsear_xml_nfe(conteudo_xml: bytes) -> ResultadoParserNFe:
             )
         )
 
-    return ResultadoParserNFe(emitente=emitente, itens=itens)
+    return ResultadoParserNFe(emitente=emitente, itens=itens, chave_acesso=chave_acesso)
 
 
 def _texto(elemento: ET.Element, tag: str) -> str | None:

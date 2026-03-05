@@ -74,6 +74,7 @@ def get_importar_xml_nfe(db: Session = Depends(get_db)) -> ImportarXmlNFe:
         ProdutoRepositoryImpl(db),
         MovimentacaoRepositoryImpl(db),
         FornecedorRepositoryImpl(db),
+        db=db,
     )
 
 from app.application.use_cases.consultar_estoque_enriquecido import ConsultarEstoqueEnriquecido

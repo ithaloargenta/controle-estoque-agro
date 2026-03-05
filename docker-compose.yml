@@ -30,5 +30,19 @@ services:
     volumes:
       - .:/app
 
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: estoque_frontend
+    environment:
+      - API_URL=http://app:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - app
+    volumes:
+      - ./frontend:/app
+
 volumes:
   postgres_data:
