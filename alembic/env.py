@@ -22,7 +22,9 @@ if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
 # Injeta a DATABASE_URL do .env no Alembic
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+import os
+db_url = os.environ.get("TEST_DATABASE_URL") or settings.DATABASE_URL
+config.set_main_option("sqlalchemy.url", db_url)
 
 # Aponta para os modelos — necessário para migrations automáticas
 target_metadata = Base.metadata
